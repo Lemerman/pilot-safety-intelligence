@@ -1,0 +1,99 @@
+competencies:
+  KNO:
+    code: "KNO"
+    name: "Application of Knowledge"
+    description: "Knowledge of aircraft systems, procedures, regulations, and meteorology appropriate to the aircraft type and operation"
+    observable_behaviors:
+      - "Demonstrates accurate knowledge of aircraft systems and their limitations"
+      - "Applies regulatory knowledge correctly in operational decisions"
+      - "Identifies and corrects procedural errors before they escalate"
+      - "Uses flight manuals and documentation appropriately"
+      - "Understands meteorological information and applies it to flight planning"
+
+  PRO:
+    code: "PRO"
+    name: "Application of Procedures and Compliance with Regulations"
+    description: "Execution of checklists, procedures, and regulatory compliance in all phases of flight"
+    observable_behaviors:
+      - "Completes all required checklists without omission"
+      - "Follows Standard Operating Procedures (SOP) consistently"
+      - "Adheres to regulatory requirements and airspace restrictions"
+      - "Corrects deviations from procedures promptly"
+      - "Maintains compliance documentation and records accurately"
+
+  COM:
+    code: "COM"
+    name: "Communication"
+    description: "Effective communication with crew, ATC, and other stakeholders; clear, timely, and appropriate"
+    observable_behaviors:
+      - "Uses standard phraseology with ATC correctly"
+      - "Briefs crew on flight plan, procedures, and potential hazards"
+      - "Listens actively and confirms understanding"
+      - "Reports problems clearly and concisely"
+      - "Adjusts communication to audience and context"
+
+  FPA:
+    code: "FPA"
+    name: "Aeroplane Flight Path Management - Automation"
+    description: "Management of flight path using automated systems; appropriate selection and monitoring of automation"
+    observable_behaviors:
+      - "Selects appropriate automation modes for phase of flight"
+      - "Programs autopilot and flight management system correctly"
+      - "Monitors automation performance and system status"
+      - "Recognizes automation limitations and transitions to manual when appropriate"
+      - "Manages mode transitions smoothly and safely"
+
+  FPM:
+    code: "FPM"
+    name: "Aeroplane Flight Path Management - Manual Control"
+    description: "Precise manual flight path management; smooth aircraft control and accurate navigation"
+    observable_behaviors:
+      - "Maintains stable flight path within acceptable limits"
+      - "Performs smooth and coordinated control inputs"
+      - "Maintains altitude, heading, and speed within limits"
+      - "Recovers from unusual attitudes promptly and safely"
+      - "Demonstrates consistent and precise manual flying skills"
+
+  LTW:
+    code: "LTW"
+    name: "Leadership and Teamwork"
+    description: "Effective crew resource management, delegation, and team coordination"
+    observable_behaviors:
+      - "Establishes clear authority and decision-making framework"
+      - "Delegates tasks appropriately and monitors execution"
+      - "Values and incorporates input from crew members"
+      - "Maintains professional and supportive crew environment"
+      - "Resolves conflicts constructively within the crew"
+
+  PSD:
+    code: "PSD"
+    name: "Problem Solving and Decision Making"
+    description: "Systematic approach to problem identification, analysis, and decision-making under pressure"
+    observable_behaviors:
+      - "Identifies problems early and accurately"
+      - "Gathers relevant information before deciding"
+      - "Evaluates alternatives and selects appropriate action"
+      - "Implements decisions decisively and monitors results"
+      - "Adjusts approach based on feedback and outcomes"
+
+  SAW:
+    code: "SAW"
+    name: "Situation Awareness and Management of Information"
+    description: "Comprehensive understanding of aircraft state, flight environment, and operational context"
+    observable_behaviors:
+      - "Maintains current knowledge of aircraft position and performance"
+      - "Monitors all relevant instruments and systems continuously"
+      - "Recognizes deviations from planned flight path immediately"
+      - "Integrates information from multiple sources correctly"
+      - "Anticipates future aircraft state and potential hazards"
+
+  WLM:
+    code: "WLM"
+    name: "Workload Management"
+    description: "Effective prioritization and management of cockpit tasks; distribution and delegation of workload"
+    observable_behaviors:
+      - "Distributes tasks appropriately among crew members"
+      - "Prioritizes critical tasks during high workload periods"
+      - "Maintains focus on flying the aircraft as primary task"
+      - "Recognizes workload limits and adjusts tasking accordingly"
+      - "Maintains situational awareness despite workload variations"
