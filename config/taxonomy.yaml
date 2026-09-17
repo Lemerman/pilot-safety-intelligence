@@ -1,0 +1,137 @@
+safety_taxonomy:
+  occurrence_classes:
+    - "Accident"
+    - "Serious Incident"
+    - "Incident"
+    - "Occurrence"
+    - "Training Observation"
+
+  occurrence_categories:
+    LOC_I:
+      code: "LOC-I"
+      name: "Loss of Control - In Flight"
+      description: "Aircraft departs from controlled flight"
+      
+    CFIT:
+      code: "CFIT"
+      name: "Controlled Flight Into Terrain"
+      description: "Airworthy aircraft flown into terrain"
+      
+    MAC:
+      code: "MAC"
+      name: "Mid-Air Collision"
+      description: "Collision between two or more aircraft in flight"
+      
+    RWYEX:
+      code: "RWYEX"
+      name: "Runway Excursion"
+      description: "Aircraft leaves assigned runway during takeoff or landing"
+      
+    RWYIN:
+      code: "RWYIN"
+      name: "Runway Incursion"
+      description: "Unauthorized aircraft or vehicle on runway"
+      
+    ARC:
+      code: "ARC"
+      name: "Abnormal Runway Contact"
+      description: "Unintended contact with runway during landing or takeoff"
+      
+    TURB:
+      code: "TURB"
+      name: "Turbulence Encounter"
+      description: "Encounter with unexpected turbulence"
+      
+    SYSFAIL:
+      code: "SYSFAIL"
+      name: "System or Component Failure"
+      description: "Aircraft system or component malfunction"
+      
+    BIRD:
+      code: "BIRD"
+      name: "Bird Strike"
+      description: "Collision with bird or wildlife"
+      
+    WEATHER:
+      code: "WEATHER"
+      name: "Weather-Related"
+      description: "Accident or incident related to weather"
+
+  events:
+    - "Pilot Error"
+    - "Maintenance Error"
+    - "ATC Error"
+    - "Weather"
+    - "Aircraft System Failure"
+    - "Procedural Deviation"
+    - "Crew Resource Management Issue"
+    - "Situational Awareness Loss"
+    - "Decision-Making Error"
+    - "Communication Breakdown"
+
+  phases_of_flight:
+    - "Pre-flight"
+    - "Takeoff"
+    - "Climb"
+    - "Cruise"
+    - "Descent"
+    - "Approach"
+    - "Landing"
+    - "Post-flight"
+
+# TEM Framework - Threat and Error Management
+tem_framework:
+  threats:
+    definition: "Events or conditions outside the flight crew's control that increase operational complexity"
+    examples:
+      - "Weather"
+      - "Aircraft Malfunction"
+      - "ATC Instruction"
+      - "Fatigue"
+      - "Runway Condition"
+      - "Airspace Congestion"
+      
+  errors:
+    definition: "Flight crew actions or inactions that result in deviations from intentions or procedures"
+    examples:
+      - "Procedural Error"
+      - "Communication Error"
+      - "Navigation Error"
+      - "Aircraft Control Error"
+      - "Checklist Error"
+      - "Calculation Error"
+      
+  undesired_aircraft_states:
+    definition: "Aircraft state that may result from unmanaged threats or errors"
+    examples:
+      - "Altitude Deviation"
+      - "Speed Deviation"
+      - "Heading Deviation"
+      - "Descent Rate Deviation"
+      - "Fuel Management Issue"
+      - "Configuration Error"
+      - "Crosswind Limit Exceeded"
+      
+  countermeasures:
+    definition: "Actions taken by flight crew to manage threats, trap errors, or recover from undesired states"
+    categories:
+      - "Technical Countermeasure"
+      - "Procedural Countermeasure"
+      - "CRM Countermeasure"
+      - "Automation Countermeasure"
+      
+  recovery:
+    definition: "Successful management of threat, error, or undesired aircraft state"
+    outcomes:
+      - "Threat Managed"
+      - "Error Trapped"
+      - "Undesired State Recovered"
+      - "Safety Margin Maintained"
+      
+  safety_margin:
+    definition: "Buffer between current aircraft state and operational limits"
+    assessment:
+      - "Excellent - Large safety margin maintained"
+      - "Good - Adequate safety margin maintained"
+      - "Marginal - Safety margin reduced"
+      - "Unacceptable - Safety margin eroded or absent"
