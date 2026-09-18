@@ -69,24 +69,28 @@ class DemoDataGenerator:
             _log(f"DEMO DATA GENERATION COMPLETE in {elapsed:.3f}s")
             _log("=" * 60)
         except Exception:
-            _update_status("failed", _STATUS["session_count"])
+            status = get_demo_data_status()
+            _update_status("failed", status["session_count"])
             raise
         finally:
             self.session.close()
 
     def _run_timed_step(self, name, func):
-        _update_status(name, _STATUS["session_count"])
-        _log(f"step={name} started session_count={_STATUS['session_count']}")
+        status = get_demo_data_status()
+        _update_status(name, status["session_count"])
+        _log(f"step={name} started session_count={status['session_count']}")
         step_start = time.perf_counter()
         func()
         elapsed = time.perf_counter() - step_start
-        _log(f"step={name} finished duration={elapsed:.3f}s session_count={_STATUS['session_count']}")
+        status = get_demo_data_status()
+        _log(f"step={name} finished duration={elapsed:.3f}s session_count={status['session_count']}")
 
     def _timed_query_all(self, query, name):
         start = time.perf_counter()
         result = query.all()
         elapsed = time.perf_counter() - start
-        _log(f"query={name} duration={elapsed:.6f}s rows={len(result)} session_count={_STATUS['session_count']}")
+        status = get_demo_data_status()
+        _log(f"query={name} duration={elapsed:.6f}s rows={len(result)} session_count={status['session_count']}")
         return result
 
     def ensure_reference_data(self):
@@ -95,7 +99,7 @@ class DemoDataGenerator:
         count_elapsed = time.perf_counter() - count_start
         _log(
             f"query=competency_reference_data duration={count_elapsed:.6f}s "
-            f"rows={competency_count} session_count={_STATUS['session_count']}"
+            f"rows={competency_count} session_count={get_demo_data_status()['session_count']}"
         )
         if competency_count == 0:
             raise RuntimeError("No competencies loaded. Run scripts/init_db.py before scripts/seed_demo_data.py.")
@@ -151,7 +155,10 @@ class DemoDataGenerator:
         commit_start = time.perf_counter()
         self.session.commit()
         commit_elapsed = time.perf_counter() - commit_start
-        _log(f"✓ Created {len(self.pilots)} pilots commit_duration={commit_elapsed:.6f}s session_count={_STATUS['session_count']}")
+        _log(
+            f"✓ Created {len(self.pilots)} pilots commit_duration={commit_elapsed:.6f}s "
+            f"session_count={get_demo_data_status()['session_count']}"
+        )
     
     def generate_evaluators(self):
         """Generate 5 anonymous evaluator records"""
@@ -181,7 +188,10 @@ class DemoDataGenerator:
         commit_start = time.perf_counter()
         self.session.commit()
         commit_elapsed = time.perf_counter() - commit_start
-        _log(f"✓ Created {len(self.evaluators)} evaluators commit_duration={commit_elapsed:.6f}s session_count={_STATUS['session_count']}")
+        _log(
+            f"✓ Created {len(self.evaluators)} evaluators commit_duration={commit_elapsed:.6f}s "
+            f"session_count={get_demo_data_status()['session_count']}"
+        )
     
     def generate_assessment_sessions(self):
         """Generate 100+ realistic assessment sessions with full TEM data"""
