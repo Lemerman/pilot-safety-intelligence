@@ -1,10 +1,9 @@
 import enum
-from datetime import datetime
 
 from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from .base import Base, utcnow_naive
 
 
 class ObservationType(enum.Enum):
@@ -20,7 +19,7 @@ class Observation(Base):
     session_id = Column(Integer, ForeignKey("assessment_sessions.session_id", ondelete="CASCADE"), nullable=False)
     observation_type = Column(String(32), nullable=False)
     description = Column(Text, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=utcnow_naive)
 
     session = relationship("AssessmentSession", back_populates="observations")
 

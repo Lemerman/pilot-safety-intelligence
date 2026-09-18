@@ -1,10 +1,9 @@
 import enum
-from datetime import datetime
 
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 
-from .base import Base
+from .base import Base, utcnow_naive
 
 
 class AssessmentType(enum.Enum):
@@ -40,7 +39,7 @@ class AssessmentSession(Base):
     assessment_type = Column(Enum(AssessmentType), nullable=False)
     aircraft_type = Column(String(32), nullable=False)
     fleet = Column(String(64), nullable=False)
-    assessment_date = Column(DateTime, nullable=False, default=datetime.utcnow)
+    assessment_date = Column(DateTime, nullable=False, default=utcnow_naive)
     training_module = Column(String(128), nullable=False)
     scenario_event = Column(String(128), nullable=False)
     pf_pm_role = Column(Enum(PFPMRole), nullable=False)

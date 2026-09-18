@@ -1,8 +1,6 @@
 from sqlalchemy import Column, DateTime, Integer, String, Text
-from sqlalchemy.orm import relationship
-from datetime import datetime
 
-from .base import Base
+from .base import Base, utcnow_naive
 
 
 class SafetyOccurrence(Base):
@@ -12,4 +10,4 @@ class SafetyOccurrence(Base):
     occurrence_class = Column(String(64), nullable=False)
     occurrence_category = Column(String(64), nullable=False)
     description = Column(Text, nullable=False)
-    created_at = Column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at = Column(DateTime, nullable=False, default=utcnow_naive)

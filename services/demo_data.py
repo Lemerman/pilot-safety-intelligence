@@ -1,6 +1,6 @@
 import random
 import time
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from models.base import SessionLocal
 from models import (
     Pilot, PilotRole, Evaluator, EvaluatorType,
@@ -20,7 +20,7 @@ _STATUS = {
 
 
 def _log(message):
-    print(f"{datetime.utcnow().isoformat(timespec='seconds')}Z {message}", flush=True)
+    print(f"{datetime.now(UTC).isoformat(timespec='seconds').replace('+00:00', 'Z')} {message}", flush=True)
 
 
 def _update_status(step, session_count=None):
@@ -207,7 +207,7 @@ class DemoDataGenerator:
             
             # Session date
             days_ago = random.randint(1, 90)
-            session_date = datetime.utcnow() - timedelta(days=days_ago)
+            session_date = datetime.now(UTC).replace(tzinfo=None) - timedelta(days=days_ago)
             
             session = AssessmentSession(
                 pilot_id=pilot.pilot_id,

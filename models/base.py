@@ -1,4 +1,5 @@
 from pathlib import Path
+from datetime import UTC, datetime
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import declarative_base, sessionmaker
@@ -30,3 +31,7 @@ Base = declarative_base()
 
 def init_database():
     Base.metadata.create_all(bind=engine)
+
+
+def utcnow_naive():
+    return datetime.now(UTC).replace(tzinfo=None)

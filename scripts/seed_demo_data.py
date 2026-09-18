@@ -4,7 +4,7 @@ import signal
 import sys
 import threading
 import time
-from datetime import datetime
+from datetime import UTC, datetime
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -28,7 +28,7 @@ from services.demo_data import generate_demo_data, get_demo_data_status
 
 
 def log(message):
-    print(f"{datetime.utcnow().isoformat(timespec='seconds')}Z {message}", flush=True)
+    print(f"{datetime.now(UTC).isoformat(timespec='seconds').replace('+00:00', 'Z')} {message}", flush=True)
 
 
 def dump_counts():
