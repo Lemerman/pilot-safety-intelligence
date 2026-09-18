@@ -101,15 +101,12 @@ class DemoDataGenerator:
             Evaluator,
             Pilot,
         ]:
-            count_start = time.perf_counter()
-            row_count = self.session.query(model).count()
-            count_elapsed = time.perf_counter() - count_start
             delete_start = time.perf_counter()
-            self.session.execute(delete(model))
+            result = self.session.execute(delete(model))
             delete_elapsed = time.perf_counter() - delete_start
             _log(
-                f"reset_table={model.__tablename__} count={row_count} "
-                f"count_duration={count_elapsed:.6f}s delete_duration={delete_elapsed:.6f}s "
+                f"reset_table={model.__tablename__} deleted={result.rowcount} "
+                f"delete_duration={delete_elapsed:.6f}s "
                 f"session_count=0"
             )
         commit_start = time.perf_counter()

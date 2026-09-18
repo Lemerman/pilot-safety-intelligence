@@ -58,6 +58,9 @@ def dump_counts():
 def inspect_locks():
     session = SessionLocal()
     try:
+        if session.bind.dialect.name != "sqlite":
+            log(f"sqlite diagnostics skipped: dialect={session.bind.dialect.name}")
+            return
         busy_timeout_rows = session.execute(text("PRAGMA busy_timeout")).fetchall()
         locking_mode_rows = session.execute(text("PRAGMA locking_mode")).fetchall()
         journal_mode_rows = session.execute(text("PRAGMA journal_mode")).fetchall()
