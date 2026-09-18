@@ -97,8 +97,13 @@ class DemoDataGenerator:
             Evaluator,
             Pilot,
         ]:
-            deleted = self.session.query(model).delete()
-            _log(f"deleted {deleted} rows from {model.__tablename__}")
+            rows = self._timed_query_all(
+                self.session.query(model),
+                f"reset_{model.__tablename__}",
+            )
+            for row in rows:
+                self.session.delete(row)
+            _log(f"deleted {len(rows)} rows from {model.__tablename__}")
         commit_start = time.perf_counter()
         self.session.commit()
         commit_elapsed = time.perf_counter() - commit_start

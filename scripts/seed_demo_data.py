@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import os
-import signal
 import sys
 import threading
 import time
@@ -86,17 +85,16 @@ def watchdog(stop_event):
         idle = time.monotonic() - status["last_progress_monotonic"]
         if idle > 10:
             log(
-                f"watchdog: stalled for {idle:.2f}s at step={status['current_step']} "
+                f"timeout: stalled for {idle:.2f}s at step={status['current_step']} "
                 f"session_count={status['session_count']}"
             )
             dump_counts()
             inspect_locks()
+            dump_stack(None, None)
             return
 
 
 if __name__ == "__main__":
-    signal.signal(signal.SIGALRM, dump_stack)
-    signal.alarm(12)
     stop_event = threading.Event()
     thread = threading.Thread(target=watchdog, args=(stop_event,), daemon=True)
     thread.start()
@@ -105,7 +103,6 @@ if __name__ == "__main__":
     try:
         generate_demo_data()
         elapsed = time.perf_counter() - start
-        signal.alarm(0)
         counts = dump_counts()
         log(
             f"final status: SUCCESS; execution_time={elapsed:.3f}s; "
@@ -113,7 +110,6 @@ if __name__ == "__main__":
         )
     except Exception as exc:
         elapsed = time.perf_counter() - start
-        signal.alarm(0)
         log(f"{type(exc).__name__}: {exc}")
         dump_counts()
         log(f"final status: FAILED; execution_time={elapsed:.3f}s; reason={type(exc).__name__}: {exc}")
