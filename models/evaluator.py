@@ -24,4 +24,9 @@ class Evaluator(Base):
     aircraft_type = Column(String(32), nullable=False)
     active = Column(Boolean, nullable=False, default=True)
 
-    assessment_sessions = relationship("AssessmentSession", back_populates="evaluator")
+    assessment_sessions = relationship(
+        "AssessmentSession",
+        back_populates="evaluator",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )

@@ -48,9 +48,14 @@ class AssessmentSession(Base):
 
     pilot = relationship("Pilot", back_populates="assessment_sessions")
     evaluator = relationship("Evaluator", back_populates="assessment_sessions")
-    events = relationship("Event", back_populates="session")
-    competency_assessments = relationship("CompetencyAssessment", back_populates="session")
-    observations = relationship("Observation", back_populates="session")
+    events = relationship("Event", back_populates="session", cascade="all, delete-orphan", passive_deletes=True)
+    competency_assessments = relationship(
+        "CompetencyAssessment",
+        back_populates="session",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    observations = relationship("Observation", back_populates="session", cascade="all, delete-orphan", passive_deletes=True)
 
 
 class Event(Base):
@@ -62,7 +67,17 @@ class Event(Base):
     phase_of_flight = Column(Enum(PhaseOfFlight), nullable=False)
 
     session = relationship("AssessmentSession", back_populates="events")
-    threats = relationship("Threat", back_populates="event")
-    errors = relationship("Error", back_populates="event")
-    undesired_aircraft_states = relationship("UndesiredAircraftState", back_populates="event")
-    countermeasures = relationship("Countermeasure", back_populates="event")
+    threats = relationship("Threat", back_populates="event", cascade="all, delete-orphan", passive_deletes=True)
+    errors = relationship("Error", back_populates="event", cascade="all, delete-orphan", passive_deletes=True)
+    undesired_aircraft_states = relationship(
+        "UndesiredAircraftState",
+        back_populates="event",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    countermeasures = relationship(
+        "Countermeasure",
+        back_populates="event",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )

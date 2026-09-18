@@ -21,5 +21,15 @@ class Pilot(Base):
     fleet = Column(String(64), nullable=False)
     active = Column(Boolean, nullable=False, default=True)
 
-    assessment_sessions = relationship("AssessmentSession", back_populates="pilot")
-    competency_profiles = relationship("PilotCompetencyProfile", back_populates="pilot")
+    assessment_sessions = relationship(
+        "AssessmentSession",
+        back_populates="pilot",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    competency_profiles = relationship(
+        "PilotCompetencyProfile",
+        back_populates="pilot",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )

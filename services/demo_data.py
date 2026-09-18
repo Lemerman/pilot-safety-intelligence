@@ -1,4 +1,5 @@
 import random
+import threading
 import time
 from datetime import UTC, datetime, timedelta
 from sqlalchemy import delete
@@ -18,6 +19,7 @@ _STATUS = {
     "session_count": 0,
     "last_progress_monotonic": time.monotonic(),
 }
+_STATUS_LOCK = threading.Lock()
 
 
 def _log(message):
@@ -25,14 +27,16 @@ def _log(message):
 
 
 def _update_status(step, session_count=None):
-    _STATUS["current_step"] = step
-    if session_count is not None:
-        _STATUS["session_count"] = session_count
-    _STATUS["last_progress_monotonic"] = time.monotonic()
+    with _STATUS_LOCK:
+        _STATUS["current_step"] = step
+        if session_count is not None:
+            _STATUS["session_count"] = session_count
+        _STATUS["last_progress_monotonic"] = time.monotonic()
 
 
 def get_demo_data_status():
-    return dict(_STATUS)
+    with _STATUS_LOCK:
+        return dict(_STATUS)
 
 
 class DemoDataGenerator:
@@ -53,6 +57,7 @@ class DemoDataGenerator:
             _log("GENERATING DEMO DATA")
             _log("=" * 60)
 
+            self._run_timed_step("ensure_reference_data", self.ensure_reference_data)
             self.reset_demo_data()
             self._run_timed_step("generate_pilots", self.generate_pilots)
             self._run_timed_step("generate_evaluators", self.generate_evaluators)
@@ -83,6 +88,17 @@ class DemoDataGenerator:
         elapsed = time.perf_counter() - start
         _log(f"query={name} duration={elapsed:.6f}s rows={len(result)} session_count={_STATUS['session_count']}")
         return result
+
+    def ensure_reference_data(self):
+        count_start = time.perf_counter()
+        competency_count = self.session.query(Competency).count()
+        count_elapsed = time.perf_counter() - count_start
+        _log(
+            f"query=competency_reference_data duration={count_elapsed:.6f}s "
+            f"rows={competency_count} session_count={_STATUS['session_count']}"
+        )
+        if competency_count == 0:
+            raise RuntimeError("No competencies loaded. Run scripts/init_db.py before scripts/seed_demo_data.py.")
 
     def reset_demo_data(self):
         _update_status("reset_demo_data")

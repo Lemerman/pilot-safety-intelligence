@@ -26,8 +26,18 @@ class Competency(Base):
     name = Column(String(128), nullable=False)
     description = Column(Text, nullable=False)
 
-    observable_behaviors = relationship("ObservableBehavior", back_populates="competency")
-    assessments = relationship("CompetencyAssessment", back_populates="competency")
+    observable_behaviors = relationship(
+        "ObservableBehavior",
+        back_populates="competency",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
+    assessments = relationship(
+        "CompetencyAssessment",
+        back_populates="competency",
+        cascade="all, delete-orphan",
+        passive_deletes=True,
+    )
 
 
 class ObservableBehavior(Base):
