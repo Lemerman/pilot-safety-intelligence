@@ -62,6 +62,9 @@ class DemoDataGenerator:
             _log("=" * 60)
             _log(f"DEMO DATA GENERATION COMPLETE in {elapsed:.3f}s")
             _log("=" * 60)
+        except Exception:
+            _update_status("failed", _STATUS["session_count"])
+            raise
         finally:
             self.session.close()
 
