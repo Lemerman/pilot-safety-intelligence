@@ -108,24 +108,24 @@ class DemoDataGenerator:
         _update_status("reset_demo_data")
         _log("step=reset_demo_data started session_count=0")
         start = time.perf_counter()
-        for model in [
-            PilotCompetencyProfile,
-            CompetencyAssessment,
-            Observation,
-            Countermeasure,
-            UndesiredAircraftState,
-            Error,
-            Threat,
-            Event,
-            AssessmentSession,
-            Evaluator,
-            Pilot,
+        for table in [
+            PilotCompetencyProfile.__table__,
+            CompetencyAssessment.__table__,
+            Observation.__table__,
+            Countermeasure.__table__,
+            UndesiredAircraftState.__table__,
+            Error.__table__,
+            Threat.__table__,
+            Event.__table__,
+            AssessmentSession.__table__,
+            Evaluator.__table__,
+            Pilot.__table__,
         ]:
             delete_start = time.perf_counter()
-            result = self.session.execute(delete(model))
+            result = self.session.execute(delete(table))
             delete_elapsed = time.perf_counter() - delete_start
             _log(
-                f"reset_table={model.__tablename__} deleted={result.rowcount} "
+                f"reset_table={table.name} deleted={result.rowcount} "
                 f"delete_duration={delete_elapsed:.6f}s "
                 f"session_count=0"
             )
