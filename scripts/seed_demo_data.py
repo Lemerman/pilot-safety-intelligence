@@ -58,10 +58,17 @@ def dump_counts():
 def inspect_locks():
     session = SessionLocal()
     try:
-        rows = session.execute(text("PRAGMA busy_timeout")).fetchall()
-        log(f"database locks: busy_timeout={rows[0][0] if rows else 'unknown'}")
+        busy_timeout_rows = session.execute(text("PRAGMA busy_timeout")).fetchall()
+        locking_mode_rows = session.execute(text("PRAGMA locking_mode")).fetchall()
+        journal_mode_rows = session.execute(text("PRAGMA journal_mode")).fetchall()
+        log(
+            "sqlite diagnostics: "
+            f"busy_timeout={busy_timeout_rows[0][0] if busy_timeout_rows else 'unknown'}, "
+            f"locking_mode={locking_mode_rows[0][0] if locking_mode_rows else 'unknown'}, "
+            f"journal_mode={journal_mode_rows[0][0] if journal_mode_rows else 'unknown'}"
+        )
     except Exception as exc:
-        log(f"database lock check failed: {type(exc).__name__}: {exc}")
+        log(f"sqlite diagnostics failed: {type(exc).__name__}: {exc}")
     finally:
         session.close()
 
