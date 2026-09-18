@@ -1,0 +1,10 @@
+grading_scale:
+  minimum: 1
+  maximum: 5
+  not_observed: "N/O"
+  descriptors:
+    1: "Performance well below expected standard"
+    2: "Performance below expected standard"
+    3: "Performance meets expected standard"
+    4: "Performance above expected standard"
+    5: "Performance consistently exceeds expected standard"

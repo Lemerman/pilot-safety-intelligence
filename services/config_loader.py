@@ -1,5 +1,9 @@
+from pathlib import Path
+
 import yaml
-import os
+
+
+CONFIG_DIR = Path(__file__).resolve().parent.parent / "config"
 
 class ConfigLoader:
     """Load configuration files from config/ directory"""
@@ -7,22 +11,22 @@ class ConfigLoader:
     @staticmethod
     def load_competencies():
         """Load competencies configuration"""
-        config_path = os.path.join("config", "competencies.yaml")
-        with open(config_path, 'r') as f:
+        config_path = CONFIG_DIR / "competencies.yaml"
+        with open(config_path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     
     @staticmethod
     def load_grading():
         """Load grading scale configuration"""
-        config_path = os.path.join("config", "grading.yaml")
-        with open(config_path, 'r') as f:
+        config_path = CONFIG_DIR / "grading.yaml"
+        with open(config_path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     
     @staticmethod
     def load_taxonomy():
         """Load safety taxonomy configuration"""
-        config_path = os.path.join("config", "taxonomy.yaml")
-        with open(config_path, 'r') as f:
+        config_path = CONFIG_DIR / "taxonomy.yaml"
+        with open(config_path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f)
     
     @staticmethod

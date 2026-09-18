@@ -1,4 +1,5 @@
 import random
+import time
 from datetime import datetime, timedelta
 from models.base import SessionLocal
 from models import (
@@ -9,6 +10,29 @@ from models import (
     Threat, Error, UndesiredAircraftState, Countermeasure,
     CompetencyAssessment, PilotCompetencyProfile
 )
+
+
+_STATUS = {
+    "current_step": "idle",
+    "session_count": 0,
+    "last_progress_monotonic": time.monotonic(),
+}
+
+
+def _log(message):
+    print(f"{datetime.utcnow().isoformat(timespec='seconds')}Z {message}", flush=True)
+
+
+def _update_status(step, session_count=None):
+    _STATUS["current_step"] = step
+    if session_count is not None:
+        _STATUS["session_count"] = session_count
+    _STATUS["last_progress_monotonic"] = time.monotonic()
+
+
+def get_demo_data_status():
+    return dict(_STATUS)
+
 
 class DemoDataGenerator:
     """Generate realistic demo data for testing and demonstration"""
@@ -22,24 +46,69 @@ class DemoDataGenerator:
     def generate_all(self):
         """Generate complete demo dataset"""
         try:
-            print("\n" + "="*60)
-            print("GENERATING DEMO DATA")
-            print("="*60)
-            
-            self.generate_pilots()
-            self.generate_evaluators()
-            self.generate_assessment_sessions()
-            
-            print("\n" + "="*60)
-            print("DEMO DATA GENERATION COMPLETE")
-            print("="*60)
-            
+            overall_start = time.perf_counter()
+            _update_status("starting")
+            _log("=" * 60)
+            _log("GENERATING DEMO DATA")
+            _log("=" * 60)
+
+            self.reset_demo_data()
+            self._run_timed_step("generate_pilots", self.generate_pilots)
+            self._run_timed_step("generate_evaluators", self.generate_evaluators)
+            self._run_timed_step("generate_assessment_sessions", self.generate_assessment_sessions)
+
+            elapsed = time.perf_counter() - overall_start
+            _update_status("complete", self.session.query(AssessmentSession).count())
+            _log("=" * 60)
+            _log(f"DEMO DATA GENERATION COMPLETE in {elapsed:.3f}s")
+            _log("=" * 60)
         finally:
             self.session.close()
+
+    def _run_timed_step(self, name, func):
+        _update_status(name, _STATUS["session_count"])
+        _log(f"step={name} started session_count={_STATUS['session_count']}")
+        step_start = time.perf_counter()
+        func()
+        elapsed = time.perf_counter() - step_start
+        _log(f"step={name} finished duration={elapsed:.3f}s session_count={_STATUS['session_count']}")
+
+    def _timed_query_all(self, query, name):
+        start = time.perf_counter()
+        result = query.all()
+        elapsed = time.perf_counter() - start
+        _log(f"query={name} duration={elapsed:.6f}s rows={len(result)} session_count={_STATUS['session_count']}")
+        return result
+
+    def reset_demo_data(self):
+        _update_status("reset_demo_data")
+        _log("step=reset_demo_data started session_count=0")
+        start = time.perf_counter()
+        for model in [
+            PilotCompetencyProfile,
+            CompetencyAssessment,
+            Observation,
+            Countermeasure,
+            UndesiredAircraftState,
+            Error,
+            Threat,
+            Event,
+            AssessmentSession,
+            Evaluator,
+            Pilot,
+        ]:
+            deleted = self.session.query(model).delete()
+            _log(f"deleted {deleted} rows from {model.__tablename__}")
+        commit_start = time.perf_counter()
+        self.session.commit()
+        commit_elapsed = time.perf_counter() - commit_start
+        elapsed = time.perf_counter() - start
+        _log(f"step=reset_demo_data finished duration={elapsed:.3f}s commit_duration={commit_elapsed:.6f}s session_count=0")
     
     def generate_pilots(self):
         """Generate 20+ anonymous pilot records"""
-        print("\nGenerating pilots...")
+        _update_status("generate_pilots")
+        _log("Generating pilots...")
         roles = [PilotRole.CAPTAIN, PilotRole.FIRST_OFFICER]
         
         for i in range(20):
@@ -52,13 +121,16 @@ class DemoDataGenerator:
             )
             self.session.add(pilot)
             self.pilots.append(pilot)
-        
+
+        commit_start = time.perf_counter()
         self.session.commit()
-        print(f"✓ Created {len(self.pilots)} pilots")
+        commit_elapsed = time.perf_counter() - commit_start
+        _log(f"✓ Created {len(self.pilots)} pilots commit_duration={commit_elapsed:.6f}s session_count={_STATUS['session_count']}")
     
     def generate_evaluators(self):
         """Generate 5 anonymous evaluator records"""
-        print("Generating evaluators...")
+        _update_status("generate_evaluators")
+        _log("Generating evaluators...")
         evaluator_types = [
             EvaluatorType.TRE,
             EvaluatorType.SIM,
@@ -79,13 +151,16 @@ class DemoDataGenerator:
             )
             self.session.add(evaluator)
             self.evaluators.append(evaluator)
-        
+
+        commit_start = time.perf_counter()
         self.session.commit()
-        print(f"✓ Created {len(self.evaluators)} evaluators")
+        commit_elapsed = time.perf_counter() - commit_start
+        _log(f"✓ Created {len(self.evaluators)} evaluators commit_duration={commit_elapsed:.6f}s session_count={_STATUS['session_count']}")
     
     def generate_assessment_sessions(self):
         """Generate 100+ realistic assessment sessions with full TEM data"""
-        print("Generating assessment sessions...")
+        _update_status("generate_assessment_sessions", 0)
+        _log("Generating assessment sessions...")
         
         assessment_types = list(AssessmentType)
         phases = list(PhaseOfFlight)
@@ -118,9 +193,15 @@ class DemoDataGenerator:
             "Heading 3 degrees off course",
             "Descent rate 100 fpm above target"
         ]
-        
+
+        competencies = self._timed_query_all(
+            self.session.query(Competency),
+            "competencies_for_assessments",
+        )
+
         session_count = 0
         for _ in range(100):
+            _update_status("generate_assessment_sessions.loop", session_count)
             pilot = random.choice(self.pilots)
             evaluator = random.choice(self.evaluators)
             
@@ -192,7 +273,6 @@ class DemoDataGenerator:
                     self.session.add(countermeasure)
             
             # Create competency assessments
-            competencies = self.session.query(Competency).all()
             for comp in competencies:
                 if random.random() > 0.3:  # Not all competencies assessed in every session
                     grade = random.choice([1, 2, 3, 3, 3, 4, 5])  # Grade 3 is most common
@@ -210,13 +290,19 @@ class DemoDataGenerator:
                     )
                     self.session.add(assessment)
             
+            commit_start = time.perf_counter()
             self.session.commit()
+            commit_elapsed = time.perf_counter() - commit_start
             session_count += 1
-            
-            if session_count % 20 == 0:
-                print(f"  ... {session_count} sessions created")
-        
-        print(f"✓ Created {session_count} assessment sessions with TEM data")
+            _update_status("generate_assessment_sessions.committed", session_count)
+
+            if session_count % 10 == 0:
+                _log(
+                    f"checkpoint session_count={session_count} "
+                    f"last_commit_duration={commit_elapsed:.6f}s"
+                )
+
+        _log(f"✓ Created {session_count} assessment sessions with TEM data")
 
 def generate_demo_data():
     """Entry point for demo data generation"""
