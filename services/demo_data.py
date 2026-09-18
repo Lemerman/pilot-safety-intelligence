@@ -1,4 +1,5 @@
 import random
+import time
 from datetime import datetime, timedelta
 from models.base import SessionLocal
 from models import (
@@ -21,6 +22,7 @@ class DemoDataGenerator:
         
     def generate_all(self):
         """Generate complete demo dataset"""
+        start_time = time.time()
         try:
             print("\n" + "="*60)
             print("GENERATING DEMO DATA")
@@ -30,8 +32,10 @@ class DemoDataGenerator:
             self.generate_evaluators()
             self.generate_assessment_sessions()
             
+            elapsed = time.time() - start_time
             print("\n" + "="*60)
             print("DEMO DATA GENERATION COMPLETE")
+            print(f"Total time: {elapsed:.2f} seconds")
             print("="*60)
             
         finally:
@@ -87,6 +91,10 @@ class DemoDataGenerator:
         """Generate 100+ realistic assessment sessions with full TEM data"""
         print("Generating assessment sessions...")
         
+        # Load competencies ONCE before the loop - FIX FOR N+1 QUERY
+        self.competencies = self.session.query(Competency).all()
+        print(f"  Loaded {len(self.competencies)} competencies")
+        
         assessment_types = list(AssessmentType)
         phases = list(PhaseOfFlight)
         pf_pm_roles = list(PFPMRole)
@@ -120,7 +128,7 @@ class DemoDataGenerator:
         ]
         
         session_count = 0
-        for _ in range(100):
+        for session_num in range(100):
             pilot = random.choice(self.pilots)
             evaluator = random.choice(self.evaluators)
             
@@ -191,9 +199,8 @@ class DemoDataGenerator:
                     )
                     self.session.add(countermeasure)
             
-            # Create competency assessments
-            competencies = self.session.query(Competency).all()
-            for comp in competencies:
+            # Create competency assessments - USE CACHED COMPETENCIES
+            for comp in self.competencies:
                 if random.random() > 0.3:  # Not all competencies assessed in every session
                     grade = random.choice([1, 2, 3, 3, 3, 4, 5])  # Grade 3 is most common
                     grade_not_obs = 1 if random.random() > 0.85 else 0
@@ -213,7 +220,7 @@ class DemoDataGenerator:
             self.session.commit()
             session_count += 1
             
-            if session_count % 20 == 0:
+            if session_count % 10 == 0:
                 print(f"  ... {session_count} sessions created")
         
         print(f"✓ Created {session_count} assessment sessions with TEM data")
