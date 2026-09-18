@@ -3,25 +3,27 @@ import os
 
 class ConfigLoader:
     """Load configuration files from config/ directory"""
+    _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    _CONFIG_DIR = os.path.join(_ROOT, "config")
     
     @staticmethod
     def load_competencies():
         """Load competencies configuration"""
-        config_path = os.path.join("config", "competencies.yaml")
+        config_path = os.path.join(ConfigLoader._CONFIG_DIR, "competencies.yaml")
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
     
     @staticmethod
     def load_grading():
         """Load grading scale configuration"""
-        config_path = os.path.join("config", "grading.yaml")
+        config_path = os.path.join(ConfigLoader._CONFIG_DIR, "grading.yaml")
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
     
     @staticmethod
     def load_taxonomy():
         """Load safety taxonomy configuration"""
-        config_path = os.path.join("config", "taxonomy.yaml")
+        config_path = os.path.join(ConfigLoader._CONFIG_DIR, "taxonomy.yaml")
         with open(config_path, 'r') as f:
             return yaml.safe_load(f)
     

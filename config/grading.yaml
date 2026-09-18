@@ -1,0 +1,11 @@
+grading:
+  scale:
+    min: 1
+    max: 5
+    not_observed: "N/O"
+  definitions:
+    "1": "Below expected standard"
+    "2": "Needs improvement"
+    "3": "Meets expected standard"
+    "4": "Above expected standard"
+    "5": "Exceptional performance"
