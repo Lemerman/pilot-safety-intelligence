@@ -1,14 +1,21 @@
-import random
+#!/usr/bin/env python
+"""Generate demo data for testing and demonstration with timing and progress"""
+import sys
+import os
 import time
+import random
 from datetime import datetime, timedelta
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 from models.base import SessionLocal
 from models import (
     Pilot, PilotRole, Evaluator, EvaluatorType,
-    Competency, CompetencyCode, ObservableBehavior,
+    Competency, CompetencyCode,
     AssessmentSession, AssessmentType, PhaseOfFlight, PFPMRole,
-    Event, Observation, ObservationType,
+    Event,
     Threat, Error, UndesiredAircraftState, Countermeasure,
-    CompetencyAssessment, PilotCompetencyProfile
+    CompetencyAssessment
 )
 
 class DemoDataGenerator:
@@ -24,20 +31,32 @@ class DemoDataGenerator:
         """Generate complete demo dataset"""
         start_time = time.time()
         try:
-            print("\n" + "="*60)
-            print("GENERATING DEMO DATA")
-            print("="*60)
+            print("\n" + "="*70)
+            print("GENERATING DEMO DATA WITH TIMING")
+            print("="*70)
             
+            step_start = time.time()
             self.generate_pilots()
+            print(f"  Elapsed: {time.time() - step_start:.2f}s")
+            
+            step_start = time.time()
             self.generate_evaluators()
+            print(f"  Elapsed: {time.time() - step_start:.2f}s")
+            
+            step_start = time.time()
             self.generate_assessment_sessions()
+            print(f"  Elapsed: {time.time() - step_start:.2f}s")
             
-            elapsed = time.time() - start_time
-            print("\n" + "="*60)
-            print("DEMO DATA GENERATION COMPLETE")
-            print(f"Total time: {elapsed:.2f} seconds")
-            print("="*60)
+            total_elapsed = time.time() - start_time
+            print("\n" + "="*70)
+            print(f"✓ DEMO DATA GENERATION COMPLETE in {total_elapsed:.2f} seconds")
+            print("="*70)
             
+        except Exception as e:
+            print(f"\n✗ ERROR: {e}")
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
         finally:
             self.session.close()
     
@@ -88,16 +107,17 @@ class DemoDataGenerator:
         print(f"✓ Created {len(self.evaluators)} evaluators")
     
     def generate_assessment_sessions(self):
-        """Generate 100+ realistic assessment sessions with full TEM data"""
+        """Generate 100 realistic assessment sessions with full TEM data"""
         print("Generating assessment sessions...")
         
-        # Load competencies ONCE before the loop - FIX FOR N+1 QUERY
-        self.competencies = self.session.query(Competency).all()
-        print(f"  Loaded {len(self.competencies)} competencies")
+        # OPTIMIZATION: Cache all static lookups BEFORE loop
+        competencies = self.session.query(Competency).all()
+        print(f"  Loaded {len(competencies)} competencies from DB")
         
         assessment_types = list(AssessmentType)
         phases = list(PhaseOfFlight)
         pf_pm_roles = list(PFPMRole)
+        comp_codes = [c.name for c in CompetencyCode]
         
         threat_types = ["Weather", "Aircraft Malfunction", "ATC Instruction", "Fatigue", "Runway Condition"]
         error_types = ["Procedural Error", "Communication Error", "Navigation Error", "Control Error", "Checklist Error"]
@@ -128,6 +148,9 @@ class DemoDataGenerator:
         ]
         
         session_count = 0
+        tem_elements_count = 0
+        comp_assessment_count = 0
+        
         for session_num in range(100):
             pilot = random.choice(self.pilots)
             evaluator = random.choice(self.evaluators)
@@ -170,6 +193,7 @@ class DemoDataGenerator:
                         threat_type=random.choice(threat_types)
                     )
                     self.session.add(threat)
+                    tem_elements_count += 1
                 
                 if random.random() > 0.5:
                     error = Error(
@@ -178,6 +202,7 @@ class DemoDataGenerator:
                         error_type=random.choice(error_types)
                     )
                     self.session.add(error)
+                    tem_elements_count += 1
                 
                 if random.random() > 0.6:
                     uas = UndesiredAircraftState(
@@ -186,10 +211,10 @@ class DemoDataGenerator:
                         state_type=random.choice(uas_types)
                     )
                     self.session.add(uas)
+                    tem_elements_count += 1
                 
-                # Add countermeasures (competency-linked)
+                # Add countermeasures
                 if random.random() > 0.4:
-                    comp_codes = [c.name for c in CompetencyCode]
                     countermeasure = Countermeasure(
                         event_id=event.event_id,
                         countermeasure_description="Effective crew coordination and problem solving",
@@ -198,11 +223,12 @@ class DemoDataGenerator:
                         effectiveness=random.choice(["Effective", "Partially Effective", "Ineffective"])
                     )
                     self.session.add(countermeasure)
+                    tem_elements_count += 1
             
-            # Create competency assessments - USE CACHED COMPETENCIES
-            for comp in self.competencies:
-                if random.random() > 0.3:  # Not all competencies assessed in every session
-                    grade = random.choice([1, 2, 3, 3, 3, 4, 5])  # Grade 3 is most common
+            # Create competency assessments - using cached competencies
+            for comp in competencies:
+                if random.random() > 0.3:
+                    grade = random.choice([1, 2, 3, 3, 3, 4, 5])
                     grade_not_obs = 1 if random.random() > 0.85 else 0
                     
                     assessment = CompetencyAssessment(
@@ -216,14 +242,17 @@ class DemoDataGenerator:
                         evaluator_justification="Standard assessment during session"
                     )
                     self.session.add(assessment)
+                    comp_assessment_count += 1
             
             self.session.commit()
             session_count += 1
             
             if session_count % 10 == 0:
-                print(f"  ... {session_count} sessions created")
+                print(f"  ... {session_count} sessions created ({tem_elements_count} TEM elements, {comp_assessment_count} competency assessments)")
         
-        print(f"✓ Created {session_count} assessment sessions with TEM data")
+        print(f"✓ Created {session_count} assessment sessions")
+        print(f"  - TEM elements: {tem_elements_count}")
+        print(f"  - Competency assessments: {comp_assessment_count}")
 
 def generate_demo_data():
     """Entry point for demo data generation"""
