@@ -7,7 +7,7 @@ from models import (
     AssessmentSession, AssessmentType, PhaseOfFlight, PFPMRole,
     Event, Observation, ObservationType,
     Threat, Error, UndesiredAircraftState, Countermeasure,
-    CompetencyAssessment, PilotCompetencyProfile
+    CompetencyAssessment, PilotCompetencyProfile, SafetyOccurrence
 )
 
 class DemoDataGenerator:
@@ -25,6 +25,8 @@ class DemoDataGenerator:
             print("\n" + "="*60)
             print("GENERATING DEMO DATA")
             print("="*60)
+
+            self.reset_existing_demo_data()
             
             self.generate_pilots()
             self.generate_evaluators()
@@ -36,6 +38,25 @@ class DemoDataGenerator:
             
         finally:
             self.session.close()
+
+    def reset_existing_demo_data(self):
+        """Ensure seeding is idempotent for repeat verification runs."""
+        for model in [
+            SafetyOccurrence,
+            Observation,
+            Countermeasure,
+            UndesiredAircraftState,
+            Error,
+            Threat,
+            CompetencyAssessment,
+            Event,
+            AssessmentSession,
+            PilotCompetencyProfile,
+            Pilot,
+            Evaluator,
+        ]:
+            self.session.query(model).delete()
+        self.session.commit()
     
     def generate_pilots(self):
         """Generate 20+ anonymous pilot records"""
